@@ -1,0 +1,11 @@
+.DS_Store
+.env
+*.log
+node_modules/
+target/
+.settings/
+.project
+.classpath
+.vscode/
+.idea/
+*.iml

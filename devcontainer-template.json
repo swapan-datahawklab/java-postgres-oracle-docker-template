@@ -1,0 +1,56 @@
+{
+    "id": "java-postgres-oracle",
+    "version": "1.0.0",
+    "name": "Java & PostgreSQL & Oracle",
+    "description": "Develop Java applications with PostgreSQL and Oracle databases. Includes JDK 21, Maven, PostgreSQL, Oracle Free, and common utilities.",
+    "documentationURL": "https://github.com/yourusername/java-postgres-oracle-devcontainer",
+    "licenseURL": "https://github.com/yourusername/java-postgres-oracle-devcontainer/blob/main/LICENSE",
+    "options": {
+        "imageVariant": {
+            "type": "string",
+            "description": "Java version (use -bullseye variants on local arm64/Apple Silicon):",
+            "proposals": [
+                "21-bullseye",
+                "17-bullseye",
+                "21-buster",
+                "17-buster"
+            ],
+            "default": "21-bullseye"
+        },
+        "installMaven": {
+            "type": "boolean",
+            "description": "Install Maven",
+            "default": true
+        },
+        "mavenVersion": {
+            "type": "string",
+            "description": "Select or enter a Maven version",
+            "proposals": [
+                "latest",
+                "3.9.6",
+                "3.8.8"
+            ],
+            "default": "latest"
+        },
+        "postgresVersion": {
+            "type": "string",
+            "description": "PostgreSQL version",
+            "proposals": [
+                "latest",
+                "16",
+                "15"
+            ],
+            "default": "latest"
+        },
+        "oracleVersion": {
+            "type": "string",
+            "description": "Oracle Free version",
+            "proposals": [
+                "23-slim-faststart",
+                "23-slim"
+            ],
+            "default": "23-slim-faststart"
+        }
+    },
+    "platforms": ["Any"]
+}

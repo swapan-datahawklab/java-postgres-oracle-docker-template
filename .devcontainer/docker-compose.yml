@@ -1,0 +1,73 @@
+version: '3.8'
+
+volumes:
+  postgres-data:
+  oracle-data:
+
+services:
+  app:
+    container_name: javadev
+    build: 
+      context: .
+      dockerfile: docker/java/Dockerfile
+      args:
+        VARIANT: ${templateOption:imageVariant}
+        INSTALL_MAVEN: ${templateOption:installMaven}
+        MAVEN_VERSION: ${templateOption:mavenVersion}
+    environment:
+      # NOTE: POSTGRES_DB/USER/PASSWORD should match values in db container
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_HOSTNAME: postgresdb
+
+    volumes:
+      - ../..:/workspaces:cached
+      
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+
+    # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
+    network_mode: service:db
+
+    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  db:
+    container_name: postgresdb
+    image: postgres:${templateOption:postgresVersion}
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init-scripts:/docker-entrypoint-initdb.d
+    environment:
+      # NOTE: POSTGRES_DB/USER/PASSWORD should match values in app container
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+
+    # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
+  oracle:
+    container_name: oracledb
+    build:
+      context: ./docker/oracledb
+      dockerfile: Dockerfile
+      args:
+        ORACLE_FREE_TAG: ${templateOption:oracleVersion}
+    environment:
+      - ORACLE_PASSWORD: SecurePassword  # For development only
+      - APP_USER: HR
+      - APP_USER_PASSWORD: HR
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+      # Mount SQL scripts for development if needed
+      - ./docker/oracledb/init-scripts:/container-entrypoint-initdb.d
+    ports:
+      - "1521:1521"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
